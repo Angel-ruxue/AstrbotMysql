@@ -1,0 +1,12 @@
+# config/database.yaml
+database:
+  type: mysql
+  mysql:
+    host: localhost       # MySQL主机
+    port: 3306            # 端口
+    user: root    # 用户名
+    password: password # 密码
+    databases:
+      - astrbot # 主数据库,默认连接数据库
+      - player  # 用户数据数据库
+      - user    # 日志数据库
