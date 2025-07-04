@@ -28,22 +28,24 @@ def time_command():
     return f"当前时间是：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
 
 
-def integral_command(user_id: int) -> str:
+def integral_command(user_id: int) -> str:  # 返回类型应为str
     """查询用户积分信息"""
-    # 获取数据库实例（使用类方法）
-    # 获取名为"player"的数据库
+    # 获取数据库实例
     user_db = DatabaseFactory.get_database("user")
 
-    # 获取用户信息，不存在则创建
+    # 获取用户信息
     user_info = user_db.get_user_info(user_id)
 
-    # 返回积分信息
+    if not user_info:
+        return f"用户ID {user_id} 不存在"
+
+    # 使用字典键访问替代属性访问
     return (
-        f"用户ID: {user_info.uid}\n"
-        f"积分: {user_info.integral}\n"
-        f"金币: {user_info.property}\n"
-        f"荣誉值: {user_info.honor}\n"
-        f"战斗力: {user_info.fighting}"
+        f"用户ID: {user_info['uid']}\n"
+        f"积分: {user_info['integral']}\n"
+        f"金币: {user_info['property']}\n"
+        f"荣誉值: {user_info['honor']}\n"
+        f"战斗力: {user_info['fighting']}"
     )
 
 
