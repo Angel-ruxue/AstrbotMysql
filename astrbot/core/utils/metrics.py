@@ -65,11 +65,11 @@ class Metric:
         except Exception as e:
             logger.error(f"保存指标到数据库失败: {e}")
 
-        try:
-            async with aiohttp.ClientSession(trust_env=True) as session:
-                async with session.post(base_url, json=payload, timeout=3) as response:
-                    if response.status != 200:
-                        logger.warning(f"指标上传失败，状态码: {response.status}")
-        except Exception as e:
-            logger.error(f"指标上传请求异常: {e}")
-            logger.error(traceback.format_exc())
+        # try:
+        #     async with aiohttp.ClientSession(trust_env=True) as session:
+        #         async with session.post(base_url, json=payload, timeout=3) as response:
+        #             if response.status != 200:
+        #                 logger.warning(f"指标上传失败，状态码: {response.status}")
+        # except Exception as e:
+        #     logger.error(f"指标上传请求异常: {e}")
+        #     logger.error(traceback.format_exc())

@@ -543,3 +543,37 @@ class MySQLDatabase(BaseDatabase):
         finally:
             if cursor:
                 cursor.close()
+
+
+
+# ------------------------- 对话分页查询操作 -------------------------
+
+
+    # 方案2：完全省略类型提示（适用于 Python 2 或不使用类型提示的环境）
+    def get_user_info(self, user_id):
+        """获取用户信息"""
+        cursor = None
+        try:
+            cursor = self._execute(
+                "SELECT uid, integral, property, honor, fighting, create_time, update_time, delete_time "
+                "FROM userinfo WHERE uid = %s AND delete_time = 0",
+                (user_id,)
+            )
+            result = cursor.fetchone()
+            if result:
+                # 确保所有字段存在且类型正确（处理可能的NULL值）
+                result['uid'] = int(result.get('uid', 0))
+                result['integral'] = int(result.get('integral', 0))
+                result['property'] = int(result.get('property', 0))
+                result['honor'] = int(result.get('honor', 0))
+                result['fighting'] = int(result.get('fighting', 0))
+                result['create_time'] = int(result.get('create_time', 0))
+                result['update_time'] = int(result.get('update_time', 0))
+                result['delete_time'] = int(result.get('delete_time', 0))
+            return result or {}
+        except Exception as e:
+            print(f"获取用户信息失败: {e}")
+            return {}
+        finally:
+            if cursor:
+                cursor.close()
