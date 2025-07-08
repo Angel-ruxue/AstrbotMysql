@@ -110,11 +110,20 @@ class Main(star.Star):
         # logger.info(f"尝试获取的消息文本 (message_str): '{text}'")
 
         # 去掉开头的 '#' 符号和前后空白字符
-        text = text.lstrip("#").strip()
+        # 假设 text = "#接龙 明察秋毫"
+        text = event.get_message_str().lstrip("#").strip()
+
         commands = {cmd.trigger: cmd for cmd in load_all_commands()}
-        command = commands.get(text)
-        if command:
-            result = command.execute()
+
+        matched = None
+        for trigger, cmd in commands.items():
+            if text.startswith(trigger):
+                matched = cmd
+                break
+
+        if matched:
+            result = matched.execute(text)
+            event.set_result(result)
         else:
             return
 
