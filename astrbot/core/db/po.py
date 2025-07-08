@@ -101,3 +101,14 @@ class Conversation:
         self.updated_at = updated_at
         self.title = title
         self.persona_id = persona_id
+
+    def to_dict(self):
+        return {
+            "user_id": self.user_id,
+            "cid": self.cid,
+            "history": self.history,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+            "title": self.title,
+            "persona_id": self.persona_id,
+        }

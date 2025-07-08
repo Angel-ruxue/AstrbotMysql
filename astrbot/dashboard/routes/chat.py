@@ -242,6 +242,7 @@ class ChatRoute(Route):
     async def delete_conversation(self):
         username = g.get("username", "guest")
         conversation_id = request.args.get("conversation_id")
+
         if not conversation_id:
             return Response().error("Missing key: conversation_id").__dict__
 
@@ -269,11 +270,15 @@ class ChatRoute(Route):
     async def get_conversations(self):
         username = g.get("username", "guest")
         conversations = self.db.get_conversations(username)
-        return Response().ok(data=conversations).__dict__
+        # 转换每个 Conversation 为 dict
+        data = [c.to_dict() for c in conversations]
+        return Response().ok(data=data).__dict__
 
     async def get_conversation(self):
         username = g.get("username", "guest")
+
         conversation_id = request.args.get("conversation_id")
+
         if not conversation_id:
             return Response().error("Missing key: conversation_id").__dict__
 
@@ -281,4 +286,4 @@ class ChatRoute(Route):
 
         self.curr_user_cid[username] = conversation_id
 
-        return Response().ok(data=conversation).__dict__
+        return Response().ok(data=conversation.to_dict()).__dict__

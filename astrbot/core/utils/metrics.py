@@ -57,11 +57,16 @@ class Metric:
             kwargs["iid"] = Metric.get_installation_id()
         except Exception as e:
             logger.error(f"获取安装ID失败: {e}")
+        result = db_helper.get_platform_metric()
+        # if result:
+        #     print("最大平台指标：", result['name'], result['count'], result['timestamp'])
+        # else:
+        #     print("没有查询到任何平台指标")
         try:
             if "adapter_name" in kwargs:
-                db_helper.insert_platform_metrics({kwargs["adapter_name"]: 1})
+                db_helper.insert_platform_metrics({kwargs["adapter_name"]: result['count']+1})
             if "llm_name" in kwargs:
-                db_helper.insert_llm_metrics({kwargs["llm_name"]: 1})
+                db_helper.insert_llm_metrics({kwargs["llm_name"]: result['count']+1})
         except Exception as e:
             logger.error(f"保存指标到数据库失败: {e}")
 

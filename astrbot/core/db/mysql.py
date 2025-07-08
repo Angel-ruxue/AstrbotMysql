@@ -76,6 +76,21 @@ class MySQLDatabase(BaseDatabase):
         except Exception as e:
             print(f"插入平台指标失败: {str(e)}")
 
+    def get_platform_metric(self):
+        """查询平台指标中 count 的最大值"""
+        try:
+            cursor = self._execute(
+                "SELECT name, count, timestamp FROM platform ORDER BY count DESC LIMIT 1"
+            )
+            row = cursor.fetchone()
+            if row:
+                return row  # 通常是一个字典，如 {'name': ..., 'count': ..., 'timestamp': ...}
+            else:
+                return None
+        except Exception as e:
+            print(f"查询平台指标失败: {str(e)}")
+            return None
+
     def insert_plugin_metrics(self, metrics: dict) -> None:
         """插入插件指标数据"""
         cursor = None
@@ -261,6 +276,7 @@ class MySQLDatabase(BaseDatabase):
                 cursor.close()
 
     def get_conversations(self, user_id: str) -> List[Conversation]:
+
         """获取用户的所有对话，按更新时间降序排列"""
         cursor = None
         try:
@@ -333,19 +349,14 @@ class MySQLDatabase(BaseDatabase):
                 cursor.close()
 
     def delete_conversation(self, user_id: str, cid: str) -> None:
-        """删除对话"""
-        cursor = None
         try:
-            cursor = self._execute(
+            self._execute(
                 "DELETE FROM webchat_conversation WHERE user_id = %s AND cid = %s",
                 (user_id, cid),
                 commit=True
             )
         except Exception as e:
             print(f"删除对话失败: {str(e)}")
-        finally:
-            if cursor:
-                cursor.close()
 
     # ------------------------- ATRI Vision数据操作 -------------------------
     def insert_atri_vision_data(self, vision: ATRIVision) -> None:

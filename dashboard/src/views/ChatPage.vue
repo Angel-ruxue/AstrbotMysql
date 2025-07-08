@@ -1015,6 +1015,7 @@ export default {
 
                 
             axios.get('/api/chat/get_conversation?conversation_id=' + cid[0]).then(async response => {
+                print("执行测试",cid[0])
                 this.currCid = cid[0];
                 let message = JSON.parse(response.data.data.history);
                 for (let i = 0; i < message.length; i++) {
