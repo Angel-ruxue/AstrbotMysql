@@ -103,14 +103,14 @@ class Main(star.Star):
     #自定义对话
     @filter.command("#")
     async def unified_command_handler(self, event):
+        # 获取发送者QQ号和用户名（新增用户名）
+        sender_qq = event.message_obj.sender.user_id
+        sender_username = event.message_obj.sender.nickname  # 新增：获取用户名
+        logger.info(f"收到来自 {sender_username}({sender_qq}) 的命令")
         text = event.get_message_str()
         logger.info(f"尝试获取的消息文本 (get_message_str): '{text}'")
 
         # text = getattr(event, "message_str", "")
-        # logger.info(f"尝试获取的消息文本 (message_str): '{text}'")
-
-        # 去掉开头的 '#' 符号和前后空白字符
-        # 假设 text = "#接龙 明察秋毫"
         text = event.get_message_str().lstrip("#").strip()
 
         commands = {cmd.trigger: cmd for cmd in load_all_commands()}
@@ -122,7 +122,8 @@ class Main(star.Star):
                 break
 
         if matched:
-            result = matched.execute(text)
+            # 传递文本、QQ号、用户名三个参数
+            result = matched.execute(text, sender_qq, sender_username)
             event.set_result(result)
         else:
             return

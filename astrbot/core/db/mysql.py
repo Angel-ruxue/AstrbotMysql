@@ -588,3 +588,70 @@ class MySQLDatabase(BaseDatabase):
         finally:
             if cursor:
                 cursor.close()
+
+    def get_users(self, qq_number: int) -> int | None:
+        cursor = None
+        try:
+            cursor = self._execute(
+                "SELECT id FROM users WHERE qq_number = %s AND delete_time = 0 LIMIT 1",
+                (qq_number,)
+            )
+            result = cursor.fetchone()
+            if result:
+                return int(result.get('id', 0))
+            return None
+        except Exception as e:
+            print(f"查询用户ID失败: {e}")
+            return None
+        finally:
+            if cursor:
+                cursor.close()
+
+    def create_users(self, user_data: dict) -> int:
+        sql = """
+        INSERT INTO users
+        (qq_number, user, create_time, update_time, delete_time, name, password, email, wechat_number, qqfc_number)
+        VALUES
+        (%(qq_number)s, %(user)s, %(create_time)s, %(update_time)s, %(delete_time)s, %(name)s, %(password)s, %(email)s, %(wechat_number)s, %(qqfc_number)s)
+        """
+
+        print("[SQL DEBUG] Running SQL:", sql)
+        print("[SQL DEBUG] With params:", user_data)
+        with self.conn.cursor() as cursor:
+            cursor.execute(sql, user_data)
+            self.conn.commit()
+            return cursor.lastrowid
+
+    def create_user_info(self, info_data: dict) -> None:
+        sql = """
+        INSERT INTO userinfo
+        (uid, integral, property, honor, fighting, create_time, update_time, delete_time)
+        VALUES
+        (%(uid)s, %(integral)s, %(property)s, %(honor)s, %(fighting)s, %(create_time)s, %(update_time)s, %(delete_time)s)
+        """
+        with self.conn.cursor() as cursor:
+            cursor.execute(sql, info_data)
+            self.conn.commit()
+
+    def add_user_info(self, uid: int, integral=0, property=0, honor=0, fighting=0) -> None:
+        sql = """
+        UPDATE userinfo
+        SET
+            integral = integral + %(integral)s,
+            property = property + %(property)s,
+            honor = honor + %(honor)s,
+            fighting = fighting + %(fighting)s,
+            update_time = %(update_time)s
+        WHERE uid = %(uid)s
+        """
+        params = {
+            "uid": uid,
+            "integral": integral,
+            "property": property,
+            "honor": honor,
+            "fighting": fighting,
+            "update_time": int(time.time())
+        }
+        with self.conn.cursor() as cursor:
+            cursor.execute(sql, params)
+            self.conn.commit()
